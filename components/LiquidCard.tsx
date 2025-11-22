@@ -12,8 +12,7 @@ export const LiquidCard: React.FC<LiquidCardProps> = ({ data }) => {
   
   const targetStyle = useRef<CardStyle>({ rotateX: 0, rotateY: 0, glareX: 50, glareY: 50 });
   const requestRef = useRef<number>(0);
-  const initialOrientation = useRef<{ beta: number | null; gamma: number | null }>({ beta: null, gamma: null });
-  const orientationCalibrated = useRef<boolean>(false);
+  const calibrationRef = useRef<{ beta: number | null; gamma: number | null; calibrated: boolean }>({ beta: null, gamma: null, calibrated: false });
 
   const lerp = (start: number, end: number, factor: number) => {
     return start + (end - start) * factor;
@@ -49,7 +48,7 @@ export const LiquidCard: React.FC<LiquidCardProps> = ({ data }) => {
     const centerY = rect.height / 2;
     
     // Enhanced rotation for iframe-like 3D effect - more responsive
-    const maxRotation = 30; // Increased for more dramatic effect like iframe
+    const maxRotation = 40; // Increased for more dramatic effect like iframe
     const rotationIntensity = 15; // Increased for more responsive feel
     let rotateY = ((x - centerX) / centerX) * rotationIntensity; 
     let rotateX = ((y - centerY) / centerY) * -rotationIntensity;
@@ -68,26 +67,32 @@ export const LiquidCard: React.FC<LiquidCardProps> = ({ data }) => {
     targetStyle.current = { rotateX: 0, rotateY: 0, glareX: 50, glareY: 50 };
   };
 
-  // Gyroscope Handler - Direct mapping for iframe-like 3D effect
+  // Gyroscope Handler - Direct mapping for iframe-like 3D effect with calibration
   const handleOrientation = useCallback((event: DeviceOrientationEvent) => {
     let { beta, gamma } = event;
     if (beta === null || gamma === null) return;
 
     // Calibrate on first reading - store initial orientation as baseline
-    if (!orientationCalibrated.current) {
-      initialOrientation.current = { beta, gamma };
-      orientationCalibrated.current = true;
-      return; // Skip first frame to establish baseline
+    if (!calibrationRef.current.calibrated) {
+      calibrationRef.current.beta = beta;
+      calibrationRef.current.gamma = gamma;
+      calibrationRef.current.calibrated = true;
+      return; // Skip first reading to establish baseline
     }
 
-    // Calculate relative rotation from initial orientation
-    const betaOffset = beta - (initialOrientation.current.beta || 0);
-    const gammaOffset = gamma - (initialOrientation.current.gamma || 0);
+    // Subtract calibration values to make card appear flat when held normally
+    const calibratedBeta = beta - (calibrationRef.current.beta || 0);
+    const calibratedGamma = gamma - (calibrationRef.current.gamma || 0);
 
     // Clamp to prevent excessive rotation that would show the back
     const maxRotation = 45; // Increased for more dramatic effect like iframe
-    let adjustedBeta = Math.max(-maxRotation, Math.min(maxRotation, betaOffset));
-    let adjustedGamma = Math.max(-maxRotation, Math.min(maxRotation, gammaOffset));
+    let adjustedBeta = calibratedBeta;
+    let adjustedGamma = calibratedGamma;
+    
+    if (adjustedBeta > maxRotation) adjustedBeta = maxRotation;
+    if (adjustedBeta < -maxRotation) adjustedBeta = -maxRotation;
+    if (adjustedGamma > maxRotation) adjustedGamma = maxRotation;
+    if (adjustedGamma < -maxRotation) adjustedGamma = -maxRotation;
 
     // More direct mapping for responsive 3D effect (like iframe)
     // Scale factor for sensitivity (0.8 gives smooth but responsive feel)
@@ -97,8 +102,8 @@ export const LiquidCard: React.FC<LiquidCardProps> = ({ data }) => {
       rotateX: -adjustedBeta * sensitivity,
       rotateY: adjustedGamma * sensitivity,
       // Dynamic glare based on orientation
-      glareX: 50 + (gammaOffset * 1.5),
-      glareY: 50 + (betaOffset * 1.5),
+      glareX: 50 + (adjustedGamma * 1),
+      glareY: 50 + (adjustedBeta * 1),
     };
   }, []);
 
