@@ -31,11 +31,22 @@
       }
     </script>
     <style>
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+      }
       body {
         font-family: 'Inter', sans-serif;
         background-color: #F7F7F5;
         color: #37352F;
         overflow-x: hidden;
+        overflow-y: hidden;
+      }
+      #root {
+        height: 100%;
+        overflow: hidden;
       }
       /* Custom scrollbar */
       ::-webkit-scrollbar {

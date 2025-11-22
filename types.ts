@@ -5,6 +5,7 @@ export interface CardData {
   email: string;
   website: string;
   phone: string;
+  linkedin?: string;
   avatarUrl?: string;
 }
 

@@ -12,6 +12,8 @@ export const LiquidCard: React.FC<LiquidCardProps> = ({ data }) => {
   
   const targetStyle = useRef<CardStyle>({ rotateX: 0, rotateY: 0, glareX: 50, glareY: 50 });
   const requestRef = useRef<number>(0);
+  const initialOrientation = useRef<{ beta: number | null; gamma: number | null }>({ beta: null, gamma: null });
+  const orientationCalibrated = useRef<boolean>(false);
 
   const lerp = (start: number, end: number, factor: number) => {
     return start + (end - start) * factor;
@@ -20,10 +22,10 @@ export const LiquidCard: React.FC<LiquidCardProps> = ({ data }) => {
   const updatePhysics = useCallback(() => {
     // More responsive lerp for iframe-like direct rotation
     setStyle(prev => ({
-      rotateX: lerp(prev.rotateX, targetStyle.current.rotateX, 0.1),
-      rotateY: lerp(prev.rotateY, targetStyle.current.rotateY, 0.1),
-      glareX: lerp(prev.glareX, targetStyle.current.glareX, 0.1),
-      glareY: lerp(prev.glareY, targetStyle.current.glareY, 0.1),
+      rotateX: lerp(prev.rotateX, targetStyle.current.rotateX, 0.2),
+      rotateY: lerp(prev.rotateY, targetStyle.current.rotateY, 0.2),
+      glareX: lerp(prev.glareX, targetStyle.current.glareX, 0.2),
+      glareY: lerp(prev.glareY, targetStyle.current.glareY, 0.2),
     }));
     requestRef.current = requestAnimationFrame(updatePhysics);
   }, []);
@@ -71,23 +73,32 @@ export const LiquidCard: React.FC<LiquidCardProps> = ({ data }) => {
     let { beta, gamma } = event;
     if (beta === null || gamma === null) return;
 
+    // Calibrate on first reading - store initial orientation as baseline
+    if (!orientationCalibrated.current) {
+      initialOrientation.current = { beta, gamma };
+      orientationCalibrated.current = true;
+      return; // Skip first frame to establish baseline
+    }
+
+    // Calculate relative rotation from initial orientation
+    const betaOffset = beta - (initialOrientation.current.beta || 0);
+    const gammaOffset = gamma - (initialOrientation.current.gamma || 0);
+
     // Clamp to prevent excessive rotation that would show the back
     const maxRotation = 45; // Increased for more dramatic effect like iframe
-    if (beta > maxRotation) beta = maxRotation;
-    if (beta < -maxRotation) beta = -maxRotation;
-    if (gamma > maxRotation) gamma = maxRotation;
-    if (gamma < -maxRotation) gamma = -maxRotation;
+    let adjustedBeta = Math.max(-maxRotation, Math.min(maxRotation, betaOffset));
+    let adjustedGamma = Math.max(-maxRotation, Math.min(maxRotation, gammaOffset));
 
     // More direct mapping for responsive 3D effect (like iframe)
     // Scale factor for sensitivity (0.8 gives smooth but responsive feel)
     const sensitivity = 0.8;
     
     targetStyle.current = {
-      rotateX: -beta * sensitivity,
-      rotateY: gamma * sensitivity,
+      rotateX: -adjustedBeta * sensitivity,
+      rotateY: adjustedGamma * sensitivity,
       // Dynamic glare based on orientation
-      glareX: 50 + (gamma * 1),
-      glareY: 50 + (beta * 1),
+      glareX: 50 + (gammaOffset * 1.5),
+      glareY: 50 + (betaOffset * 1.5),
     };
   }, []);
 
@@ -114,7 +125,7 @@ export const LiquidCard: React.FC<LiquidCardProps> = ({ data }) => {
     };
   }, [handleOrientation]);
 
-  const qrPayload = data.website ? `https://${data.website}` : data.email ? `mailto:${data.email}` : "https://example.com";
+  const qrPayload = data.linkedin ? data.linkedin : data.website ? `https://${data.website}` : data.email ? `mailto:${data.email}` : "https://example.com";
   const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qrPayload)}&bgcolor=FFFFFF&color=000000&margin=0`;
 
   return (
@@ -129,7 +140,7 @@ export const LiquidCard: React.FC<LiquidCardProps> = ({ data }) => {
         <div 
           ref={cardRef}
           className={`
-            relative w-full max-w-[340px] h-[600px] bg-notion-bg
+            relative w-full max-w-[340px] h-[90vh] max-h-[600px] bg-notion-bg
             rounded-xl shadow-[0_8px_30px_rgba(0,0,0,0.12)] border border-notion-border
             transition-transform duration-100 ease-linear overflow-hidden
           `}
@@ -174,7 +185,7 @@ export const LiquidCard: React.FC<LiquidCardProps> = ({ data }) => {
                 </div>
 
                 {/* Name & Role */}
-                <div className="mb-6 w-full">
+                <div className="mb-2 w-full">
                     <h1 className="text-2xl font-bold text-notion-text font-sans tracking-tight leading-tight">
                         {data.name || "Untitled"}
                     </h1>
@@ -186,7 +197,7 @@ export const LiquidCard: React.FC<LiquidCardProps> = ({ data }) => {
                 </div>
 
                 {/* Properties Grid - Vertical for Badge */}
-                <div className="space-y-2 w-full text-sm text-left mb-auto">
+                <div className="space-y-1 w-full text-sm text-left mb-auto">
                     
                     {/* Email Property */}
                     {data.email && (
@@ -227,8 +238,8 @@ export const LiquidCard: React.FC<LiquidCardProps> = ({ data }) => {
 
                 {/* Bio (Notion Quote Style) */}
                 {data.bio && (
-                    <div className="w-full mt-6 px-1 text-left">
-                        <blockquote className="border-l-[3px] border-notion-text pl-4 py-1 my-2">
+                    <div className="w-full mt-2 px-1 text-left">
+                        <blockquote className="border-l-[3px] border-notion-text pl-4 py-1 my-1">
                             <p className="text-notion-text font-serif text-lg leading-relaxed">
                                 {data.bio}
                             </p>
