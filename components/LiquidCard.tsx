@@ -175,7 +175,7 @@ export const LiquidCard: React.FC<LiquidCardProps> = ({ data }) => {
                        <iframe 
                         src={data.avatarUrl} 
                         title="Avatar"
-                        className="w-full h-full border-0 rounded-full"
+                        className="w-full h-full border-0 rounded-full scale-105"
                         scrolling="no"
                         frameBorder="0"
                         allow="accelerometer; gyroscope; magnetometer"
