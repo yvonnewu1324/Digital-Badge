@@ -9,7 +9,7 @@ const CARD_DATA: CardData = {
   roles: ["Software Engineer", "Meme Lover"],
   tags: ["#AI", "#Tech", "#3D"],
   bio: "Love turning ideas into reality. Lets connect and make something cool together!",
-  email: "imyujiewu@example.com",
+  email: "imyujiewu@gmail.com",
   website: "yu-jiewu.vercel.app",
   phone: "+1 (530) 750-6577",
   linkedin: "https://www.linkedin.com/in/yu-jie-wu-a07823172", // Update with your LinkedIn URL
@@ -20,7 +20,6 @@ const GYRO_MODAL_SHOWN_KEY = 'gyro-modal-shown';
 
 const App: React.FC = () => {
   const [showGyroModal, setShowGyroModal] = useState(false);
-  const [gyroPermissionGranted, setGyroPermissionGranted] = useState(false);
 
   useEffect(() => {
     // Check if modal should be shown
@@ -41,7 +40,6 @@ const App: React.FC = () => {
   };
 
   const handlePermissionGranted = () => {
-    setGyroPermissionGranted(true);
     localStorage.setItem(GYRO_MODAL_SHOWN_KEY, 'true');
     // Trigger a custom event to notify Badge that permission is granted
     window.dispatchEvent(new CustomEvent('gyroPermissionGranted'));
