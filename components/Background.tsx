@@ -1,6 +1,6 @@
 import React from 'react';
 
-export const LiquidBackground: React.FC = () => {
+export const Background: React.FC = () => {
   return (
     <div className="fixed inset-0 -z-10 bg-[#F7F7F5] pointer-events-none">
       {/* Dot Grid Pattern */}

@@ -2,11 +2,11 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { CardData, CardStyle } from '../types';
 import { Mail, Globe, Phone, Share2, ArrowUpRight } from 'lucide-react';
 
-interface LiquidCardProps {
+interface BadgeProps {
   data: CardData;
 }
 
-export const LiquidCard: React.FC<LiquidCardProps> = ({ data }) => {
+export const Badge: React.FC<BadgeProps> = ({ data }) => {
   const cardRef = useRef<HTMLDivElement>(null);
   const [style, setStyle] = useState<CardStyle>({ rotateX: 0, rotateY: 0, glareX: 50, glareY: 50 });
   
@@ -184,7 +184,7 @@ export const LiquidCard: React.FC<LiquidCardProps> = ({ data }) => {
         <div 
           ref={cardRef}
           className={`
-            relative w-full max-w-[340px] h-[90vh] max-h-[600px] bg-notion-bg
+            relative w-full max-w-[340px] h-[94vh] max-h-[600px] bg-notion-bg
             rounded-xl shadow-[0_8px_30px_rgba(0,0,0,0.12)] border border-notion-border
             transition-transform duration-100 ease-linear overflow-hidden
           `}
@@ -209,7 +209,7 @@ export const LiquidCard: React.FC<LiquidCardProps> = ({ data }) => {
             <div className="px-6 relative flex flex-col items-center text-center h-[calc(100%-112px)]">
                 
                 {/* Avatar Iframe Container */}
-                <div className="-mt-16 mb-4 relative z-10 w-32 h-32 shrink-0 rounded-full border-[3px] border-white bg-white shadow-sm overflow-hidden group/avatar"
+                <div className="-mt-16 mb-2 relative z-10 w-32 h-32 shrink-0 rounded-full border-[3px] border-white bg-white shadow-sm overflow-hidden group/avatar"
                   // style={{
                   //   maskImage: "radial-gradient(circle, white 99%, transparent 100%)",
                   //   WebkitMaskImage: "radial-gradient(circle, white 99%, transparent 100%)",
@@ -243,16 +243,50 @@ export const LiquidCard: React.FC<LiquidCardProps> = ({ data }) => {
                    <div className="absolute inset-0 rounded-full shadow-[inset_0_0_20px_rgba(0,0,0,0.1)] pointer-events-none mix-blend-overlay"></div>
                 </div>
 
-                {/* Name & Role */}
+                {/* Name & Roles */}
                 <div className="mb-2 w-full">
                     <h1 className="text-2xl font-bold text-notion-text font-sans tracking-tight leading-tight">
                         {data.name || "Untitled"}
                     </h1>
-                    <div className="mt-2">
-                         <span className="bg-notion-tag text-notion-text px-2 py-0.5 rounded text-sm font-medium">
-                            {data.role || "N/A"}
-                        </span>
+                    <div className="mt-2 flex flex-wrap gap-1.5 justify-center">
+                         {data.roles && data.roles.length > 0 ? (
+                            data.roles.map((role, index) => (
+                                <span key={index} className="bg-notion-tag text-notion-text px-2 py-0.5 rounded text-sm font-medium">
+                                    {role}
+                                </span>
+                            ))
+                         ) : (
+                            <span className="bg-notion-tag text-notion-text px-2 py-0.5 rounded text-sm font-medium">
+                                N/A
+                            </span>
+                         )}
                     </div>
+                    {/* Tags with random colors */}
+                    {data.tags && data.tags.length > 0 && (
+                        <div className="mt-2 flex flex-wrap gap-1.5 justify-center">
+                            {data.tags.map((tag, index) => {
+                                // Color palette for tags - assign colors based on index
+                                const tagColors = [
+                                    { bg: 'bg-blue-100', text: 'text-blue-700' },
+                                    { bg: 'bg-purple-100', text: 'text-purple-700' },
+                                    { bg: 'bg-pink-100', text: 'text-pink-700' },
+                                    { bg: 'bg-green-100', text: 'text-green-700' },
+                                    { bg: 'bg-yellow-100', text: 'text-yellow-700' },
+                                    { bg: 'bg-orange-100', text: 'text-orange-700' },
+                                    { bg: 'bg-red-100', text: 'text-red-700' },
+                                    { bg: 'bg-indigo-100', text: 'text-indigo-700' },
+                                    { bg: 'bg-teal-100', text: 'text-teal-700' },
+                                    { bg: 'bg-cyan-100', text: 'text-cyan-700' },
+                                ];
+                                const color = tagColors[index % tagColors.length];
+                                return (
+                                    <span key={index} className={`${color.bg} ${color.text} px-2 py-0.5 rounded text-sm font-medium`}>
+                                        {tag}
+                                    </span>
+                                );
+                            })}
+                        </div>
+                    )}
                 </div>
 
                 {/* Properties Grid - Vertical for Badge */}
@@ -307,7 +341,7 @@ export const LiquidCard: React.FC<LiquidCardProps> = ({ data }) => {
                 )}
 
                 {/* QR Code (Bottom Area) */}
-                <div className="mt-6 pt-4 border-t border-notion-border w-full flex justify-center pb-6">
+                <div className="mt-2 pt-2 border-t border-notion-border w-full flex justify-center pb-6">
                      <div className="w-20 h-20 bg-white border border-notion-border p-1.5 rounded-sm shadow-sm">
                          <img src={qrUrl} alt="QR" className="w-full h-full object-contain opacity-90 mix-blend-multiply" />
                      </div>

@@ -1,6 +1,7 @@
 export interface CardData {
   name: string;
-  role: string;
+  roles: string[];
+  tags?: string[];
   bio: string;
   email: string;
   website: string;

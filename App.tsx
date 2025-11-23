@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { LiquidBackground } from './components/LiquidBackground';
-import { LiquidCard } from './components/LiquidCard';
+import { Background } from './components/Background';
+import { Badge } from './components/Badge';
 import { GyroPermissionModal } from './components/GyroPermissionModal';
 import { CardData } from './types';
 
 const CARD_DATA: CardData = {
-  name: "Yu-Jie(Yvonne) Wu",
-  role: "Software Engineer",
-  bio: "Obsessed with simplicity and functional aesthetics. Building tools that think like you do.",
+  name: "Yu-Jie(Yvonne) Wu 🦄",
+  roles: ["Software Engineer", "Meme Lover"],
+  tags: ["#AI", "#Tech", "#3D"],
+  bio: "Love turning ideas into reality. Lets connect and make something cool together!",
   email: "imyujiewu@example.com",
   website: "yu-jiewu.vercel.app",
   phone: "+1 (530) 750-6577",
@@ -42,17 +43,17 @@ const App: React.FC = () => {
   const handlePermissionGranted = () => {
     setGyroPermissionGranted(true);
     localStorage.setItem(GYRO_MODAL_SHOWN_KEY, 'true');
-    // Trigger a custom event to notify LiquidCard that permission is granted
+    // Trigger a custom event to notify Badge that permission is granted
     window.dispatchEvent(new CustomEvent('gyroPermissionGranted'));
   };
 
   return (
     <div className="w-full h-full font-sans text-[#37352F] selection:bg-[#2EAADC]/30 overflow-hidden" style={{ touchAction: 'pan-y pan-x', overscrollBehavior: 'none' }}>
-      <LiquidBackground />
+      <Background />
 
       {/* Main Content - Full Screen */}
       <main className="w-full h-full flex items-center justify-center overflow-hidden" style={{ overscrollBehavior: 'none' }}>
-        <LiquidCard data={CARD_DATA} />
+        <Badge data={CARD_DATA} />
       </main>
 
       {/* Gyro Permission Modal */}

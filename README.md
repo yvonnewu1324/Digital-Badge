@@ -1,20 +1,34 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Digital Badge
 
-# Run and deploy your AI Studio app
+A 3D interactive badge with gyroscope support.
 
-This contains everything you need to run your app locally.
+## Features
 
-View your app in AI Studio: https://ai.studio/apps/drive/1R0hLsJgBvgxW4uOisxxQXgP7rue6rK73
+- 3D tilt effects with mouse and gyroscope
+- Mobile gyroscope support
 
-## Run Locally
-
-**Prerequisites:**  Node.js
-
+## Getting Started
 
 1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+   ```bash
+   npm install
+   ```
+
+2. Run the development server:
+   ```bash
+   npm run dev
+   ```
+
+3. Open your browser and navigate to the local URL shown in the terminal.
+
+## Avatar
+
+The avatar uses an iframe that can be created with Figma's Shapelax plugin. Export your Shapelax design as HTML and set the `avatarUrl` in `App.tsx` to point to the exported HTML file.
+
+## Customization
+
+Edit `App.tsx` to customize your badge information:
+- Name, roles, and tags
+- Contact information
+- Bio
+- Avatar URL
