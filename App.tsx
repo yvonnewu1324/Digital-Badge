@@ -11,7 +11,7 @@ const CARD_DATA: CardData = {
   website: "yu-jiewu.vercel.app",
   phone: "+1 (530) 750-6577",
   linkedin: "https://www.linkedin.com/in/yu-jie-wu-a07823172", // Update with your LinkedIn URL
-  avatarUrl: "https://davvcdn.lon1.cdn.digitaloceanspaces.com/c718d30f896f72b4ae9185798485a7ba/5122b996cc2fc795d6bb.html",
+  avatarUrl: "/avatar.html", // https://davvcdn.lon1.cdn.digitaloceanspaces.com/c718d30f896f72b4ae9185798485a7ba/5122b996cc2fc795d6bb.html"
 };
 
 const App: React.FC = () => {

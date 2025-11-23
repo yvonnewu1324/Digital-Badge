@@ -170,16 +170,31 @@ export const LiquidCard: React.FC<LiquidCardProps> = ({ data }) => {
             <div className="px-6 relative flex flex-col items-center text-center h-[calc(100%-112px)]">
                 
                 {/* Avatar Iframe Container */}
-                <div className="-mt-16 mb-4 relative z-10 w-32 h-32 shrink-0 rounded-full border-[6px] border-white bg-white shadow-sm overflow-hidden group/avatar">
+                <div className="-mt-16 mb-4 relative z-10 w-32 h-32 shrink-0 rounded-full border-[3px] border-white bg-white shadow-sm overflow-hidden group/avatar"
+                  // style={{
+                  //   maskImage: "radial-gradient(circle, white 99%, transparent 100%)",
+                  //   WebkitMaskImage: "radial-gradient(circle, white 99%, transparent 100%)",
+                  // }}
+                >
                    {data.avatarUrl ? (
-                       <iframe 
-                        src={data.avatarUrl} 
-                        title="Avatar"
-                        className="w-full h-full border-0 rounded-full scale-105"
-                        scrolling="no"
-                        frameBorder="0"
-                        allow="accelerometer; gyroscope; magnetometer"
-                       />
+                     <div className="absolute inset-0 bg-white rounded-full">
+                      <div className="w-full h-full rounded-full overflow-hidden bg-white ">
+                       <iframe
+                       src={data.avatarUrl}
+                       title="Avatar"
+                       className="
+                         w-full h-full border-0 
+                         block bg-white 
+                         will-change-transform 
+                         [backface-visibility:hidden] 
+                         [transform:translateZ(0)] 
+                       "
+                       scrolling="no"
+                       frameBorder="0"
+                       allow="accelerometer; gyroscope; magnetometer"
+                     />
+                      </div>
+                     </div>
                    ) : (
                         <div className="w-full h-full bg-gray-100 flex items-center justify-center text-4xl rounded-full">
                              🦄
