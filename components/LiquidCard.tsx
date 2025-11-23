@@ -107,28 +107,67 @@ export const LiquidCard: React.FC<LiquidCardProps> = ({ data }) => {
     };
   }, []);
 
-  useEffect(() => {
-    const requestAccess = async () => {
-        if (typeof (DeviceOrientationEvent as any).requestPermission === 'function') {
+  // Notify iframe to request gyro permission
+  const notifyIframePermission = useCallback(() => {
+    // Use setTimeout to ensure DOM is ready
+    setTimeout(() => {
+      const iframe = document.querySelector('iframe[src*="avatar.html"]') as HTMLIFrameElement;
+      if (iframe) {
+        const sendMessage = () => {
           try {
-            const response = await (DeviceOrientationEvent as any).requestPermission();
-            if (response === 'granted') {
-                window.addEventListener('deviceorientation', handleOrientation);
+            if (iframe.contentWindow) {
+              iframe.contentWindow.postMessage({ type: 'REQUEST_GYRO_PERMISSION' }, '*');
             }
           } catch (e) {
-            console.error(e);
+            console.log('Could not send message to iframe:', e);
           }
-        } else {
-           window.addEventListener('deviceorientation', handleOrientation);
+        };
+
+        // Try immediately if iframe is already loaded
+        sendMessage();
+
+        // Also listen for load event
+        iframe.addEventListener('load', sendMessage, { once: true });
+      }
+    }, 100);
+  }, []);
+
+  // Request gyro permission and setup listener
+  const setupGyroListener = useCallback(async () => {
+    if (typeof (DeviceOrientationEvent as any).requestPermission === 'function') {
+      try {
+        const response = await (DeviceOrientationEvent as any).requestPermission();
+        if (response === 'granted') {
+          window.addEventListener('deviceorientation', handleOrientation);
+          // Notify iframe to request permission
+          notifyIframePermission();
         }
+      } catch (e) {
+        console.error(e);
+      }
+    } else {
+      window.addEventListener('deviceorientation', handleOrientation);
+      // Notify iframe to request permission (for browsers that don't require permission)
+      notifyIframePermission();
+    }
+  }, [handleOrientation, notifyIframePermission]);
+
+  useEffect(() => {
+    // Listen for permission granted event from modal
+    const handlePermissionGranted = () => {
+      setupGyroListener();
     };
 
-    requestAccess();
+    window.addEventListener('gyroPermissionGranted', handlePermissionGranted);
+    
+    // Also try to setup initially (for browsers that don't require permission)
+    setupGyroListener();
     
     return () => {
+      window.removeEventListener('gyroPermissionGranted', handlePermissionGranted);
       window.removeEventListener('deviceorientation', handleOrientation);
     };
-  }, [handleOrientation]);
+  }, [setupGyroListener, handleOrientation]);
 
   const qrPayload = data.linkedin ? data.linkedin : data.website ? `https://${data.website}` : data.email ? `mailto:${data.email}` : "https://example.com";
   const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qrPayload)}&bgcolor=FFFFFF&color=000000&margin=0`;
