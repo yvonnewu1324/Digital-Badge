@@ -1,5 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Smartphone, X } from 'lucide-react';
+import { useGyroPermission } from '../hooks/useGyroPermission';
+import { useIsIOS } from '../hooks/useIsIOS';
 
 interface GyroPermissionModalProps {
   onClose: () => void;
@@ -39,76 +41,25 @@ const getLanguage = (): 'en' | 'zh' => {
 };
 
 export const GyroPermissionModal: React.FC<GyroPermissionModalProps> = ({ onClose, onPermissionGranted }) => {
-  const [isRequesting, setIsRequesting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [lang] = useState<'en' | 'zh'>(getLanguage());
   const t = translations[lang];
+  const { isRequesting, error, requestGyroPermission } = useGyroPermission();
+  const isIOS = useIsIOS();
 
-  const isMobile = () => {
-    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
-           (window.innerWidth <= 768);
-  };
-
-  const requestGyroPermission = async () => {
-    setIsRequesting(true);
-    setError(null);
-
-    try {
-      // Request permission for main window
-      if (typeof (DeviceOrientationEvent as any).requestPermission === 'function') {
-        const response = await (DeviceOrientationEvent as any).requestPermission();
-        if (response === 'granted') {
-          // Request permission for iframe via postMessage
-          requestIframePermission();
-          onPermissionGranted();
-          onClose();
-        } else {
-          setError(t.errorPermission);
-        }
-      } else {
-        // For browsers that don't require permission (older versions)
-        requestIframePermission();
-        onPermissionGranted();
-        onClose();
-      }
-    } catch (err) {
-      console.error('Error requesting gyroscope permission:', err);
-      setError(t.errorRequest);
-    } finally {
-      setIsRequesting(false);
+  const handleRequestPermission = async () => {
+    const granted = await requestGyroPermission();
+    if (granted) {
+      onPermissionGranted();
+      onClose();
     }
-  };
-
-  const requestIframePermission = () => {
-    // Send message to iframe to request permission
-    setTimeout(() => {
-      const iframe = document.querySelector('iframe[src*="avatar.html"]') as HTMLIFrameElement;
-      if (iframe) {
-        const sendMessage = () => {
-          try {
-            if (iframe.contentWindow) {
-              iframe.contentWindow.postMessage({ type: 'REQUEST_GYRO_PERMISSION' }, '*');
-            }
-          } catch (e) {
-            console.log('Could not send message to iframe:', e);
-          }
-        };
-
-        // Try immediately if iframe is already loaded
-        sendMessage();
-
-        // Also listen for load event
-        iframe.addEventListener('load', sendMessage, { once: true });
-      }
-    }, 100);
   };
 
   const handleSkip = () => {
     onClose();
   };
 
-  if (!isMobile()) {
-    // Don't show modal on desktop
+  if (!isIOS) {
+    // Only show modal on iOS devices (iPhone, iPad)
     return null;
   }
 
@@ -153,7 +104,7 @@ export const GyroPermissionModal: React.FC<GyroPermissionModalProps> = ({ onClos
         {/* Buttons */}
         <div className="flex flex-col gap-3">
           <button
-            onClick={requestGyroPermission}
+            onClick={handleRequestPermission}
             disabled={isRequesting}
             className="w-full bg-notion-text text-white py-3 px-6 rounded-lg font-medium hover:bg-opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
