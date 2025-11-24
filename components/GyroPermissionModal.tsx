@@ -18,7 +18,7 @@ const translations = {
     skipButton: 'Skip for Now',
     close: 'Close',
     errorPermission: 'Gyroscope permission is required to use this feature. Please allow permission in your browser settings.',
-    errorRequest: 'An error occurred while requesting permission. Please try again later.',
+    errorRequest: 'Permission denied. Please try clearing website data or use Private/Incognito mode to reset permissions.',
     note: 'You can change this permission anytime in your browser settings',
   },
   zh: {
@@ -30,7 +30,7 @@ const translations = {
     skipButton: '稍後再說',
     close: '關閉',
     errorPermission: '需要陀螺儀權限才能使用此功能。請在瀏覽器設定中允許權限。',
-    errorRequest: '請求權限時發生錯誤，請稍後再試。',
+    errorRequest: '權限被拒絕。請嘗試清除網站資料或使用無痕模式來重置權限。',
     note: '您可以在瀏覽器設定中隨時更改此權限',
   },
 };

@@ -1,32 +1,6 @@
 import { useEffect, useRef, useCallback } from 'react';
 
 /**
- * Sends a message to the avatar iframe to request gyroscope permission
- */
-const notifyIframePermission = () => {
-  setTimeout(() => {
-    const iframe = document.querySelector('iframe[src*="avatar.html"]') as HTMLIFrameElement;
-    if (iframe) {
-      const sendMessage = () => {
-        try {
-          if (iframe.contentWindow) {
-            iframe.contentWindow.postMessage({ type: 'REQUEST_GYRO_PERMISSION' }, '*');
-          }
-        } catch (e) {
-          console.log('Could not send message to iframe:', e);
-        }
-      };
-
-      // Try immediately if iframe is already loaded
-      sendMessage();
-
-      // Also listen for load event
-      iframe.addEventListener('load', sendMessage, { once: true });
-    }
-  }, 100);
-};
-
-/**
  * Global device orientation listener hook
  * Initializes listener immediately when app loads, not waiting for card to render
  * Handles permission detection and broadcasts orientation events
@@ -73,7 +47,6 @@ export const useDeviceOrientation = () => {
         try {
           window.addEventListener('deviceorientation', handleOrientation);
           listenerAdded.current = true;
-          notifyIframePermission();
         } catch (e) {
           console.error('Failed to add deviceorientation listener:', e);
         }
@@ -81,7 +54,6 @@ export const useDeviceOrientation = () => {
         // For browsers that don't require permission, add listener directly
         window.addEventListener('deviceorientation', handleOrientation);
         listenerAdded.current = true;
-        notifyIframePermission();
         // Trigger permission granted event for non-iOS devices immediately
         // Only trigger if we haven't already notified
         if (!hasNotifiedPermission.current) {

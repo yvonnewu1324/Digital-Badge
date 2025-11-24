@@ -19,7 +19,7 @@ export const useGyroPermission = () => {
         if (response === 'granted') {
           return true;
         } else {
-          setError('Gyroscope permission is required to use this feature. Please allow permission in your browser settings.');
+          setError('Permission denied. Please try clearing website data or use Private/Incognito mode to reset permissions.');
           return false;
         }
       } else {
