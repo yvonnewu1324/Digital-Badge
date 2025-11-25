@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { CardData } from '../types';
 import { Mail, Globe, Phone } from 'lucide-react';
 import { useCard3D } from '../hooks/useCard3D';
@@ -9,14 +9,40 @@ interface BadgeProps {
 
 export const Badge: React.FC<BadgeProps> = ({ data }) => {
   const { cardRef, style, handleMouseMove, handleMouseLeave } = useCard3D();
+  const [scale, setScale] = useState(1);
+
+  useEffect(() => {
+    const handleResize = () => {
+      const padding = 32; // Minimum padding around the card
+      const baseWidth = 340;
+      const baseHeight = 600;
+      
+      // Calculate scale to fit within the viewport while maintaining aspect ratio
+      const scaleX = (window.innerWidth - padding) / baseWidth;
+      const scaleY = (window.innerHeight - padding) / baseHeight;
+      
+      // Choose the smaller scale factor to fit both width and height
+      // Allow scaling up to 1.2x for larger screens, but ensure it fits small screens
+      const newScale = Math.min(scaleX, scaleY, 1.2);
+      
+      // Ensure scale doesn't get too small or negative
+      setScale(Math.max(newScale, 0.3));
+    };
+
+    // Initial calculation
+    handleResize();
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const qrPayload = data.linkedin ? data.linkedin : data.website ? `https://${data.website}` : data.email ? `mailto:${data.email}` : "https://example.com";
   const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qrPayload)}&bgcolor=FFFFFF&color=000000&margin=0`;
 
   return (
-    <div className="flex flex-col items-center gap-8 perspective-[1500px] w-full">
+    <div className="flex flex-col items-center justify-center gap-8 perspective-[1500px] w-full h-full">
       <div 
-        className="relative group cursor-default w-full flex justify-center"
+        className="relative group cursor-default flex justify-center items-center"
         style={{ perspective: '1500px' }}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
@@ -25,12 +51,12 @@ export const Badge: React.FC<BadgeProps> = ({ data }) => {
         <div 
           ref={cardRef}
           className={`
-            relative w-full max-w-[340px] h-[94vh] max-h-[600px] bg-notion-bg
+            relative w-[340px] h-[600px] bg-notion-bg
             rounded-xl shadow-[0_8px_30px_rgba(0,0,0,0.12)] border border-notion-border
             transition-transform duration-100 ease-linear overflow-hidden
           `}
           style={{
-            transform: `rotateX(${style.rotateX}deg) rotateY(${style.rotateY}deg) scale3d(1, 1, 1)`,
+            transform: `rotateX(${style.rotateX}deg) rotateY(${style.rotateY}deg) scale3d(${scale}, ${scale}, 1)`,
             transformStyle: 'preserve-3d',
           }}
         >

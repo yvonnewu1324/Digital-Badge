@@ -42,9 +42,7 @@ export const useGyroModal = () => {
           window.removeEventListener('gyroPermissionGranted', handlePermissionCheck);
         }, 500);
       }
-      // If no permission API needed, don't show modal (older iOS or already working)
     }
-    // For non-iOS devices, useDeviceOrientation handles permission detection
   }, [isIOS]);
 
   const handleModalClose = () => {
