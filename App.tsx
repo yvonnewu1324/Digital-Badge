@@ -10,7 +10,7 @@ const CARD_DATA: CardData = {
   name: "Yu-Jie(Yvonne) Wu 🦄",
   roles: ["Software Engineer", "Meme Lover"],
   tags: ["#AI", "#Tech", "#3D"],
-  bio: "Love turning ideas into reality. Lets connect and make something cool together!",
+  bio: "Love turning ideas into reality. Let's connect and make something cool together!",
   email: "imyujiewu@gmail.com",
   website: "yu-jiewu.vercel.app",
   phone: "+1 (530) 750-6577",
